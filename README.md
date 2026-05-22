@@ -19,9 +19,9 @@ I like systems that are reliable, understandable and boring in production. Borin
 
 - Building backend/database tools and examples around SQL Server
 - Improving my personal portfolio
-- Writing about real-world database development problems
+- Turning real-world database problems into useful notes and examples
 
-## Off keyboard
+## Away from the keyboard
 
 Guitar, mountains, motorcycle and dancing.  
 Different kind of debugging, same persistence.
