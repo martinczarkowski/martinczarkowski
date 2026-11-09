@@ -1,0 +1,74 @@
+name: Update profile README
+
+on:
+  schedule:
+    - cron: "17 4 * * *"   # daily, 04:17 UTC
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:   # sources only; the generated SVGs and stats.json never trigger a run
+      - profile.toml
+      - today.py
+      - render.py
+      - github_stats.py
+      - assets/portrait.txt
+      - .github/workflows/build.yml
+
+permissions:
+  contents: write   # commit the regenerated SVGs; nothing else
+
+concurrency:
+  group: profile-readme
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.14'
+
+      # Per-repository commit cache, kept out of the public repository on purpose.
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: cache
+          key: profile-stats-${{ github.run_id }}
+          restore-keys: profile-stats-
+
+      # today.py uses only the standard library; Pillow (requirements.txt) is needed
+      # only to regenerate the portrait locally with portrait.py.
+      - name: Refresh statistics and render SVGs
+        env:
+          GH_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN || github.token }}
+          HAS_PAT: ${{ secrets.PROFILE_STATS_TOKEN != '' }}
+          INCLUDE_PRIVATE: ${{ vars.INCLUDE_PRIVATE }}
+        run: |
+          if [ "$INCLUDE_PRIVATE" = "true" ] && [ "$HAS_PAT" != "true" ]; then
+            echo "::error::INCLUDE_PRIVATE=true needs the PROFILE_STATS_TOKEN secret (see SETUP.md)"
+            exit 1
+          fi
+          python today.py
+
+      # Runs after a partial failure too: metrics that loaded are still worth saving.
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: ${{ !cancelled() && hashFiles('cache/stats_cache.json') != '' }}
+        with:
+          path: cache
+          key: profile-stats-${{ github.run_id }}
+
+      - name: Commit changes
+        if: ${{ !cancelled() }}
+        run: |
+          git add light_mode.svg dark_mode.svg stats.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Update profile stats"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

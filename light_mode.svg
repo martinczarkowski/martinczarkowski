@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" font-family="ConsolasFallback,Consolas,monospace" width="985px" height="530px" font-size="16px">
+<style>
+@font-face {
+src: local('Consolas');
+font-family: 'ConsolasFallback';
+font-display: swap;
+size-adjust: 109%;
+}
+.key {fill: #953800;}
+.value {fill: #0a3069;}
+.addColor {fill: #1a7f37;}
+.delColor {fill: #cf222e;}
+.cc {fill: #c2cfde;}
+text, tspan {white-space: pre;}
+</style>
+<rect width="985px" height="530px" fill="#f6f8fa" rx="15"/>
+<text x="15" y="30" fill="#24292f" class="ascii">
+<tspan x="15" y="30">            ';Ljkkmm%mkl!:`</tspan>
+<tspan x="15" y="50">         `:!j%MgmwmM%mMgMml;.</tspan>
+<tspan x="15" y="70">        'Ljm&amp;&amp;@@@@@@@@@@@&amp;MmT,`</tspan>
+<tspan x="15" y="90">       :lm%M&amp;gmkLLlkkjmmM&amp;@@gk;`</tspan>
+<tspan x="15" y="110">      :lwg&amp;Mm:.``  `':,;!L]m&amp;&amp;k,`</tspan>
+<tspan x="15" y="130">     .LkwM&amp;m!,,''.````.::,!|LgMT:</tspan>
+<tspan x="15" y="150">    `,km%M%F;;,:.````..'':,!T]&amp;k;`</tspan>
+<tspan x="15" y="170">    `!w%&amp;g%F;,,;!!TFL;:,!TkkjjMwL'</tspan>
+<tspan x="15" y="190">    'Tklw%mL',LlkmwklT:'kmmwkF%ml,</tspan>
+<tspan x="15" y="210">    ';,,|Fm,'`':;LLLL;` LlTTlTw%j,</tspan>
+<tspan x="15" y="230">    .,;:|,w!,'.```,,:'``,|!;;!]kl,</tspan>
+<tspan x="15" y="250">    `;l::!kT!,,,!l]jj]|!FmFL!LlFL'</tspan>
+<tspan x="15" y="270">     :l%kmkj]LL]&amp;@Mg&amp;&amp;gg@@&amp;&amp;w]jL;`</tspan>
+<tspan x="15" y="290">     `;kg&amp;m%mjjj&amp;mkFLL|Tjm%&amp;w%T;'</tspan>
+<tspan x="15" y="310">      `;jMjm%mgg@MkkmM%%%%&amp;@gk!'</tspan>
+<tspan x="15" y="330">       `;jFLw%M%%&amp;&amp;%%&amp;&amp;g&amp;@@M|,.</tspan>
+<tspan x="15" y="350">       .;kF;Ljmm%g&amp;@@@@&amp;@@MjL,.</tspan>
+<tspan x="15" y="370">     `,Tm&amp;L;;!LFm%g&amp;@@@&amp;%kjgMmF!'</tspan>
+<tspan x="15" y="390">  `:!Fm%&amp;&amp;w;,;;!L|LL|ljkFT]&amp;@@&amp;%kL,'`</tspan>
+<tspan x="15" y="410">,Lkm%%g&amp;&amp;&amp;@];,,,;!L!!LF]LTF&amp;@@@@@&amp;%wT</tspan>
+<tspan x="15" y="430">mm%g&amp;g&amp;&amp;&amp;@@&amp;j!;,,,;;LTlLL]w@@@@@@@@@@</tspan>
+<tspan x="15" y="450">M%M@g&amp;&amp;&amp;@@@@@g%kT!!LlFFkM&amp;@@@@@@@@@@@</tspan>
+<tspan x="15" y="470">MM@&amp;M&amp;&amp;&amp;&amp;&amp;@@@@@@@@@@@@@@@@@@@@@@@@@@@</tspan>
+<tspan x="15" y="490">g&amp;@&amp;g&amp;&amp;&amp;&amp;@&amp;&amp;@@@@@@@@@@@@@@@@@@@@@@@@@</tspan>
+<tspan x="15" y="510">g&amp;@&amp;g&amp;&amp;&amp;&amp;&amp;@&amp;&amp;&amp;@@@@@@@@@@@@@@@@@@@@@@@</tspan>
+</text>
+<text x="390" y="30" fill="#24292f">
+<tspan x="390" y="30">martin@czarkowski -——————————————————————————————————————-—-</tspan>
+<tspan x="390" y="50" class="cc">. </tspan><tspan class="key">OS</tspan>:<tspan class="cc"> .................................... </tspan><tspan class="value">Windows 11, Linux</tspan>
+<tspan x="390" y="70" class="cc">. </tspan><tspan class="key">GitHub</tspan>.<tspan class="key">Uptime</tspan>:<tspan class="cc"> ............... </tspan><tspan class="value">6 years, 10 months, 27 days</tspan>
+<tspan x="390" y="90" class="cc">. </tspan><tspan class="key">Host</tspan>:<tspan class="cc"> ........................................... </tspan><tspan class="value">Safetica</tspan>
+<tspan x="390" y="110" class="cc">. </tspan><tspan class="key">Kernel</tspan>:<tspan class="cc"> ..................... </tspan><tspan class="value">Database &amp; Backend Developer</tspan>
+<tspan x="390" y="130" class="cc">. </tspan><tspan class="key">IDE</tspan>:<tspan class="cc"> ................................. </tspan><tspan class="value">Visual Studio, SSMS</tspan>
+<tspan x="390" y="150" class="cc">. </tspan>
+<tspan x="390" y="170" class="cc">. </tspan><tspan class="key">Languages</tspan>.<tspan class="key">Programming</tspan>:<tspan class="cc"> ................. </tspan><tspan class="value">T-SQL, C#, Python</tspan>
+<tspan x="390" y="190" class="cc">. </tspan><tspan class="key">Languages</tspan>.<tspan class="key">Database</tspan>:<tspan class="cc"> ....... </tspan><tspan class="value">SQL Server, PostgreSQL, Oracle</tspan>
+<tspan x="390" y="210" class="cc">. </tspan><tspan class="key">Frameworks</tspan>:<tspan class="cc"> ................................ </tspan><tspan class="value">.NET, EF Core</tspan>
+<tspan x="390" y="230" class="cc">. </tspan>
+<tspan x="390" y="250" class="cc">. </tspan><tspan class="key">Hobbies</tspan>.<tspan class="key">Music</tspan>:<tspan class="cc"> .................................... </tspan><tspan class="value">Guitar</tspan>
+<tspan x="390" y="270" class="cc">. </tspan><tspan class="key">Hobbies</tspan>.<tspan class="key">Dance</tspan>:<tspan class="cc"> ................... </tspan><tspan class="value">Salsa, Bachata, Kizomba</tspan>
+<tspan x="390" y="290" class="cc">. </tspan><tspan class="key">Hobbies</tspan>.<tspan class="key">Outdoor</tspan>:<tspan class="cc"> ................ </tspan><tspan class="value">MTB, Hiking, Via Ferrata</tspan>
+<tspan x="390" y="310" class="cc">. </tspan><tspan class="key">Hobbies</tspan>.<tspan class="key">Other</tspan>:<tspan class="cc"> .................... </tspan><tspan class="value">Motorcycling, Swimming</tspan>
+<tspan x="390" y="350">- Contact -——————————————————————————————————————————————-—-</tspan>
+<tspan x="390" y="370" class="cc">. </tspan><tspan class="key">Email</tspan>:<tspan class="cc"> ........................ </tspan><tspan class="value">martinczarkowski@gmail.com</tspan>
+<tspan x="390" y="390" class="cc">. </tspan><tspan class="key">LinkedIn</tspan>:<tspan class="cc"> .................. </tspan><tspan class="value">in/martin-czarkowski-4252828b</tspan>
+<tspan x="390" y="410" class="cc">. </tspan><tspan class="key">GitHub</tspan>:<tspan class="cc"> ................................. </tspan><tspan class="value">martinczarkowski</tspan>
+<tspan x="390" y="450">- GitHub Stats -—————————————————————————————————————————-—-</tspan>
+<tspan x="390" y="470" class="cc">. </tspan><tspan class="key">Repos</tspan>:<tspan class="cc"> ....... </tspan><tspan class="value">7</tspan> {<tspan class="key">Contributed</tspan>: <tspan class="value">5</tspan>} | <tspan class="key">Stars</tspan>:<tspan class="cc"> ............. </tspan><tspan class="value">0</tspan>
+<tspan x="390" y="490" class="cc">. </tspan><tspan class="key">Commits</tspan>:<tspan class="cc"> ..................... </tspan><tspan class="value">25</tspan> | <tspan class="key">Followers</tspan>:<tspan class="cc"> ......... </tspan><tspan class="value">3</tspan>
+<tspan x="390" y="510" class="cc">. </tspan><tspan class="key">Net Lines Committed</tspan>:<tspan class="cc"> ............. </tspan><tspan class="value">2,115</tspan> ( <tspan class="addColor">2,145++</tspan>, <tspan class="delColor">30--</tspan> )
+</text>
+</svg>
