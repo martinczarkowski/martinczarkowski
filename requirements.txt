@@ -1,2 +1,7 @@
-# Only portrait.py needs this; today.py and the workflow use the standard library.
-Pillow==13.0.0
+# Only portrait.py needs this; today.py uses the standard library.
+# Install with: python -m pip install --require-hashes --only-binary :all: -r requirements.txt
+# Hashes of the CPython 3.14 wheels for Linux x86_64 (CI), Windows x64 and macOS arm64 (PyPI).
+Pillow==13.0.0 \
+    --hash=sha256:e91c2b1cbeae768c98752e67e717e283d68dae45717b41f2d91eaee648e37b7d \
+    --hash=sha256:f7cbb7a64e7ec664775195e4f81923bc8a93d9451b963f844e59118f63147a7a \
+    --hash=sha256:d9b0a2bee3f3e03e9f29057aedb807dbf1e1d96ee1b9d0f422d9db6c8583271d

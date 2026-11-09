@@ -4,8 +4,12 @@
     GH_TOKEN=... python today.py --include-private # also private repositories the token can read
     python today.py --offline                      # re-render from stats.json, no API calls
 
-A metric that fails to load keeps its last good value from stats.json (never a fake zero);
-the script then exits with code 1 so the workflow run is marked as failed.
+stats.json records `status` (complete / partial / failed) and `stale`, the metrics that show a
+previous or cached value because they could not be refreshed. A metric that never loaded stays
+null and renders as n/a, never as a made-up zero.
+
+Exit codes: 0 complete, 1 partial or failed refresh (files are still written with the best
+known values), 2 configuration error (no token, content does not fit the card; nothing written).
 """
 from __future__ import annotations
 
@@ -21,23 +25,54 @@ import github_stats
 import render
 
 ROOT = Path(__file__).resolve().parent
-STATS_FILE = ROOT / "stats.json"
-CACHE_FILE = ROOT / "cache" / "stats_cache.json"
 
 
-def merge_stats(previous: dict, fresh: dict, scope: str) -> tuple[dict, list[str]]:
-    """New values where available, otherwise the previous value of the same scope."""
+def merge_stats(previous: dict, result: github_stats.CollectResult, scope: str) -> dict:
+    """Fresh values where available, otherwise the previous value of the same scope, marked stale."""
     same_scope = previous.get("scope") == scope
-    stats, failed = {"scope": scope}, []
-    for key, value in fresh.items():
-        if value is None:
-            failed.append(key)
-            value = previous.get(key) if same_scope else None
+    stale = set(result.stale)
+    stats: dict = {"scope": scope}
+    for key, value in result.values.items():
+        if value is None and same_scope and previous.get(key) is not None:
+            value = previous[key]
+            stale.add(key)
         stats[key] = value
-    return stats, failed
+    stats["status"] = result.status
+    stats["stale"] = sorted(stale)
+    return stats
 
 
-def main(argv: list[str] | None = None) -> int:
+def load_json(path: Path) -> dict:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+    except (OSError, ValueError):
+        print(f"::warning::{path.name} is unreadable, starting without previous values")
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def write_atomic(path: Path, content: str) -> None:
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(content, encoding="utf-8", newline="\n")
+    os.replace(temporary, path)
+
+
+def write_summary(stats: dict, errors: list[str]) -> None:
+    """GitHub Actions job summary; errors are already free of private repository details."""
+    target = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not target:
+        return
+    lines = [f"### Profile statistics: {stats.get('status', 'offline')}", ""]
+    if stats.get("stale"):
+        lines.append(f"Previous or cached values kept for: {', '.join(stats['stale'])}")
+    lines += [f"- {error}" for error in errors]
+    with open(target, "a", encoding="utf-8") as summary:
+        summary.write("\n".join(lines) + "\n")
+
+
+def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--offline", action="store_true", help="render from stats.json without calling the API")
     parser.add_argument("--include-private", action="store_true",
@@ -45,32 +80,41 @@ def main(argv: list[str] | None = None) -> int:
                         help="include private repositories (or set INCLUDE_PRIVATE=true)")
     args = parser.parse_args(argv)
 
-    profile = tomllib.loads((ROOT / "profile.toml").read_text(encoding="utf-8"))
-    previous = json.loads(STATS_FILE.read_text(encoding="utf-8")) if STATS_FILE.exists() else {}
-    stats, failed = previous, []
+    profile = tomllib.loads((root / "profile.toml").read_text(encoding="utf-8"))
+    portrait = (root / "assets" / "portrait.txt").read_text(encoding="utf-8").splitlines()
+    stats = load_json(root / "stats.json")
+    errors: list[str] = []
 
     if not args.offline:
         token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
         if not token:
             print("error: set GH_TOKEN (or run with --offline)", file=sys.stderr)
             return 2
-        cache = github_stats.load_cache(CACHE_FILE)
-        fresh, errors = github_stats.collect(github_stats.GitHubClient(token), profile["login"],
-                                             args.include_private, cache)
-        github_stats.save_cache(CACHE_FILE, cache)
-        for error in errors:
-            print(f"::warning::{error}")
-        stats, failed = merge_stats(previous, fresh, "all" if args.include_private else "public")
-        STATS_FILE.write_text(json.dumps(stats, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+        cache_file = root / "cache" / "stats_cache.json"
+        cache = github_stats.load_cache(cache_file)
+        result = github_stats.collect(github_stats.GitHubClient(token), profile["login"], args.include_private, cache)
+        github_stats.save_cache(cache_file, cache)
+        errors = result.errors
+        stats = merge_stats(stats, result, "all" if args.include_private else "public")
 
-    portrait = (ROOT / "assets" / "portrait.txt").read_text(encoding="utf-8").splitlines()
-    today = datetime.now(UTC).date()
-    for theme, svg in render.render_all(profile, portrait, stats, today).items():
-        (ROOT / f"{theme}_mode.svg").write_text(svg, encoding="utf-8", newline="\n")
+    try:
+        svgs = render.render_all(profile, portrait, stats, datetime.now(UTC).date())
+    except render.LayoutError as err:
+        print(f"::error::{err}")
+        return 2
 
+    if not args.offline:
+        write_atomic(root / "stats.json", json.dumps(stats, indent=2, sort_keys=True) + "\n")
+    for theme, svg in svgs.items():
+        write_atomic(root / f"{theme}_mode.svg", svg)
+
+    for error in errors:
+        print(f"::warning::{error}")
     print("stats:", json.dumps(stats, sort_keys=True))
-    if failed:
-        print(f"::error::not refreshed, previous values kept: {', '.join(failed)}")
+    write_summary(stats, errors)
+    if not args.offline and stats["status"] != "complete":
+        stale = ", ".join(stats["stale"]) or "none"
+        print(f"::error::statistics {stats['status']}: previous or cached values kept for: {stale}")
         return 1
     return 0
 

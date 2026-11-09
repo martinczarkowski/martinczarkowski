@@ -7,5 +7,7 @@
   "followers": 3,
   "repos": 7,
   "scope": "public",
-  "stars": 0
+  "stale": [],
+  "stars": 0,
+  "status": "complete"
 }

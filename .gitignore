@@ -1,4 +1,6 @@
 .venv/
 __pycache__/
-# Per-repository commit cache; persisted by actions/cache, never committed.
+# Per-repository commit cache; persisted by actions/cache in public mode, never committed.
 cache/
+# Leftovers of an interrupted atomic write.
+*.tmp
