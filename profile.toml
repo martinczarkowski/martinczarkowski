@@ -6,25 +6,27 @@ header = "martin@czarkowski"
 
 # Groups of [key, value] rows on the right side, separated by a "." spacer line.
 # Keys with dots ("Languages.Programming") are coloured per part, like the reference design.
-# "{uptime}" is replaced by the age of the GitHub account, computed from the GitHub API.
+# "{account_age}" is replaced by the age of the GitHub account, computed from the GitHub API.
+# Every line must fit 60 characters and the whole card 25 lines (985x530); rendering fails
+# with a clear error otherwise.
 info = [
   [
     ["OS", "Windows 11, Linux"],
-    ["GitHub.Uptime", "{uptime}"],
+    ["GitHub.Age", "{account_age}"],
     ["Host", "Safetica"],
     ["Kernel", "Database & Backend Developer"],
     ["IDE", "Visual Studio, SSMS"],
   ],
   [
     ["Languages.Programming", "T-SQL, C#, Python"],
-    ["Languages.Database", "SQL Server, PostgreSQL, Oracle"],
+    ["Databases", "SQL Server, PostgreSQL, Oracle"],
     ["Frameworks", ".NET, EF Core"],
+    ["Focus", "Security, Performance, Migrations"],
   ],
   [
-    ["Hobbies.Music", "Guitar"],
     ["Hobbies.Dance", "Salsa, Bachata, Kizomba"],
-    ["Hobbies.Outdoor", "MTB, Hiking, Via Ferrata"],
-    ["Hobbies.Other", "Motorcycling, Swimming"],
+    ["Hobbies.Outdoor", "MTB, Hiking, Via Ferrata, Swimming"],
+    ["Hobbies.Other", "Guitar, Motorcycling"],
   ],
 ]
 

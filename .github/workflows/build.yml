@@ -11,13 +11,15 @@ on:
       - today.py
       - render.py
       - github_stats.py
-      - assets/portrait.txt
+      - portrait.py
+      - requirements.txt
+      - assets/**
+      - tests/**
       - .github/workflows/build.yml
 
-permissions:
-  contents: write   # commit the regenerated SVGs; nothing else
+permissions: {}
 
-concurrency:
+concurrency:   # one update at a time: no racing pushes, no clobbered cache
   group: profile-readme
   cancel-in-progress: false
 
@@ -25,45 +27,83 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write   # push the regenerated files; nothing else
+    env:
+      PRIVATE_MODE: ${{ vars.INCLUDE_PRIVATE == 'true' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false   # the push token is given to the commit step only
 
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.14'
 
-      # Per-repository commit cache, kept out of the public repository on purpose.
+      # Pillow is installed only when the photo, the [portrait] settings, portrait.py or the
+      # pinned Pillow version changed; the daily statistics run needs the standard library only.
+      - name: Check portrait fingerprint
+        id: portrait
+        run: |
+          if python portrait.py --check; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Regenerate portrait
+        if: steps.portrait.outputs.stale == 'true'
+        run: |
+          python -m pip install --require-hashes --only-binary :all: --no-deps -r requirements.txt
+          python portrait.py
+
+      - name: Run tests
+        id: tests
+        run: python -m unittest discover -s tests -v
+
+      # Public mode only: the cache holds public commit data. Private mode rescans every run
+      # so that no private repository metadata is stored in the Actions cache.
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: env.PRIVATE_MODE != 'true'
         with:
           path: cache
           key: profile-stats-${{ github.run_id }}
           restore-keys: profile-stats-
 
-      # today.py uses only the standard library; Pillow (requirements.txt) is needed
-      # only to regenerate the portrait locally with portrait.py.
+      # Exit code of today.py: 0 complete, 1 partial (files written, run marked failed),
+      # 2 configuration error (nothing written).
       - name: Refresh statistics and render SVGs
+        id: refresh
         env:
           GH_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN || github.token }}
           HAS_PAT: ${{ secrets.PROFILE_STATS_TOKEN != '' }}
-          INCLUDE_PRIVATE: ${{ vars.INCLUDE_PRIVATE }}
+          INCLUDE_PRIVATE: ${{ env.PRIVATE_MODE }}
         run: |
           if [ "$INCLUDE_PRIVATE" = "true" ] && [ "$HAS_PAT" != "true" ]; then
             echo "::error::INCLUDE_PRIVATE=true needs the PROFILE_STATS_TOKEN secret (see SETUP.md)"
-            exit 1
+            echo "exit=2" >> "$GITHUB_OUTPUT"
+            exit 2
           fi
-          python today.py
+          status=0
+          python today.py || status=$?
+          echo "exit=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
-      # Runs after a partial failure too: metrics that loaded are still worth saving.
+      # Also after a partial refresh: the repositories that did load are worth keeping.
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: ${{ !cancelled() && hashFiles('cache/stats_cache.json') != '' }}
+        if: ${{ !cancelled() && env.PRIVATE_MODE != 'true' && steps.refresh.outcome != 'skipped' && hashFiles('cache/stats_cache.json') != '' }}
         with:
           path: cache
           key: profile-stats-${{ github.run_id }}
 
+      # A partial refresh is still published (best known values, stats.json says what is stale);
+      # failed tests or a configuration error publish nothing.
       - name: Commit changes
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.tests.outcome == 'success' && (steps.refresh.outputs.exit == '0' || steps.refresh.outputs.exit == '1') }}
+        env:
+          PUSH_TOKEN: ${{ github.token }}
         run: |
-          git add light_mode.svg dark_mode.svg stats.json
+          git add light_mode.svg dark_mode.svg stats.json assets/portrait.txt assets/portrait.sha256
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
@@ -71,4 +111,4 @@ jobs:
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
               commit -m "Update profile stats"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push "https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"
