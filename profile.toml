@@ -1,0 +1,51 @@
+# Content of the profile card. Edit, then run `python today.py --offline` to re-render
+# the SVGs locally, or push to master and let the workflow regenerate them.
+
+login = "martinczarkowski"
+header = "martin@czarkowski"
+
+# Groups of [key, value] rows on the right side, separated by a "." spacer line.
+# Keys with dots ("Languages.Programming") are coloured per part, like the reference design.
+# "{uptime}" is replaced by the age of the GitHub account, computed from the GitHub API.
+info = [
+  [
+    ["OS", "Windows 11, Linux"],
+    ["GitHub.Uptime", "{uptime}"],
+    ["Host", "Safetica"],
+    ["Kernel", "Database & Backend Developer"],
+    ["IDE", "Visual Studio, SSMS"],
+  ],
+  [
+    ["Languages.Programming", "T-SQL, C#, Python"],
+    ["Languages.Database", "SQL Server, PostgreSQL, Oracle"],
+    ["Frameworks", ".NET, EF Core"],
+  ],
+  [
+    ["Hobbies.Music", "Guitar"],
+    ["Hobbies.Dance", "Salsa, Bachata, Kizomba"],
+    ["Hobbies.Outdoor", "MTB, Hiking, Via Ferrata"],
+    ["Hobbies.Other", "Motorcycling, Swimming"],
+  ],
+]
+
+contact = [
+  ["Email", "martinczarkowski@gmail.com"],
+  ["LinkedIn", "in/martin-czarkowski-4252828b"],
+  ["GitHub", "martinczarkowski"],
+]
+
+[portrait]
+source = "assets/portrait.jpg"
+columns = 37
+rows = 25
+# Vertical crop and horizontal centre, as fractions of the source photo.
+crop_top = 0.07
+crop_bottom = 0.88
+center_x = 0.5
+# Subject mask in fractions of the source photo; the busy background outside it is dropped.
+head = [0.51, 0.37, 0.21, 0.30]  # ellipse: centre x, centre y, radius x, radius y
+body = [[0.36, 0.60], [0.66, 0.60], [0.72, 0.67], [0.95, 0.78], [1.0, 1.0], [0.0, 1.0], [0.05, 0.80], [0.30, 0.67]]
+mask_blur = 0.015
+sharpen = 80       # unsharp-mask strength in percent, brings out eyes and brows
+gamma = 1.0        # >1 lightens mid-tones (skin), <1 darkens them
+edge_weight = 0.35 # extra ink on outlines of facial features

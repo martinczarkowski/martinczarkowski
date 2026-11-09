@@ -1,0 +1,2 @@
+# Only portrait.py needs this; today.py and the workflow use the standard library.
+Pillow==13.0.0
