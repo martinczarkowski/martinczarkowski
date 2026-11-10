@@ -154,6 +154,9 @@ account's commits on that branch (oid, additions, deletions, merge flag).
   other change.
 - **GitHub.Age**: age of the GitHub account, from the API's `createdAt`.
 
+Repositories whose owner is listed in `exclude_owners` in `profile.toml` (case-insensitive) are
+left out of every metric.
+
 A metric that cannot be refreshed keeps its previous value and is listed in `stats.json` under
 `stale`. A metric that never loaded shows `n/a`. Neither is ever replaced by a zero.
 

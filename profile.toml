@@ -3,6 +3,7 @@
 
 login = "martinczarkowski"
 header = "martin@czarkowski"
+exclude_owners = ["humanit-services"]   # repositories of these owners are left out of the statistics
 
 # Groups of [key, value] rows on the right side, separated by a "." spacer line.
 # Keys with dots ("Languages.Programming") are coloured per part, like the reference design.
