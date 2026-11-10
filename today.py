@@ -92,7 +92,8 @@ def main(argv: list[str] | None = None, root: Path = ROOT) -> int:
             return 2
         cache_file = root / "cache" / "stats_cache.json"
         cache = github_stats.load_cache(cache_file)
-        result = github_stats.collect(github_stats.GitHubClient(token), profile["login"], args.include_private, cache)
+        result = github_stats.collect(github_stats.GitHubClient(token), profile["login"], args.include_private, cache,
+                                      profile.get("exclude_owners", []))
         github_stats.save_cache(cache_file, cache)
         errors = result.errors
         stats = merge_stats(stats, result, "all" if args.include_private else "public")

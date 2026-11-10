@@ -11,7 +11,8 @@ Definitions (see SETUP.md for the limitations):
               `repositoriesContributedTo` list (commits, PRs, reviews, issues, recently)
 
 Scanned repositories = owned / collaborator / organisation-member repositories plus the
-`repositoriesContributedTo` list. Private repositories only when include_private is set.
+`repositoriesContributedTo` list, minus repositories of the owners in `exclude_owners`.
+Private repositories only when include_private is set.
 The per-repository commit cache makes daily runs incremental: a repository whose default
 branch head did not move is not queried again.
 
@@ -285,8 +286,11 @@ def update_repo(client: GitHubClient, repo_id: str, head: str, branch: str, user
     return {"head": head, "branch": branch, "commits": commits}
 
 
-def collect(client: GitHubClient, login: str, include_private: bool, cache: dict) -> CollectResult:
+def collect(client: GitHubClient, login: str, include_private: bool, cache: dict,
+            exclude_owners: list[str] | tuple[str, ...] = ()) -> CollectResult:
     """Fetch all metrics. A metric that could not be determined reliably is None.
+
+    Repositories of `exclude_owners` (case-insensitive) are left out of every metric.
 
     `cache` is updated in place. In private mode, errors carry only the failure kind, never
     API messages or repository names, because workflow logs of a public repository are public.
@@ -320,6 +324,9 @@ def collect(client: GitHubClient, login: str, include_private: bool, cache: dict
         if not include_private:   # never trust the privacy filter alone
             affiliated = [repo for repo in affiliated if not repo["isPrivate"]]
             contributed_to = [repo for repo in contributed_to if not repo["isPrivate"]]
+        excluded = {owner.lower() for owner in exclude_owners}
+        affiliated = [repo for repo in affiliated if repo["owner"]["login"].lower() not in excluded]
+        contributed_to = [repo for repo in contributed_to if repo["owner"]["login"].lower() not in excluded]
         for repo in affiliated + contributed_to:   # fail here, not mid-scan, on a malformed node
             repo["id"], repo["isPrivate"], repo["nameWithOwner"]
         owned = [repo for repo in affiliated if repo["owner"]["login"].lower() == login.lower()]

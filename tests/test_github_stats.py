@@ -69,8 +69,8 @@ class FakeClient:
         return {"node": {"defaultBranchRef": {"target": {"history": history}}}}
 
 
-def collect(client, cache=None, include_private=False):
-    return gs.collect(client, LOGIN, include_private, {} if cache is None else cache)
+def collect(client, cache=None, include_private=False, exclude_owners=()):
+    return gs.collect(client, LOGIN, include_private, {} if cache is None else cache, exclude_owners)
 
 
 class CollectAggregationTests(unittest.TestCase):
@@ -105,6 +105,14 @@ class CollectAggregationTests(unittest.TestCase):
                             contributed=[repo("ext", "h3", owner="org"), repo("a", "h1")],
                             histories={"a": [commit("c1")], "ext": []})
         self.assertEqual(collect(client).values["contributed"], 2)
+
+    def test_collect_excludedOwner_reposNeitherScannedNorCounted(self):
+        client = FakeClient([repo("a", "h1"), repo("work", "h2", owner="Some-Org")],
+                            contributed=[repo("work", "h2", owner="Some-Org"), repo("ext", "h3", owner="other")],
+                            histories={"a": [commit("c1")], "work": [commit("c2")], "ext": []})
+        values = collect(client, exclude_owners=["some-org"]).values
+        self.assertEqual((values["commits"], values["contributed"]), (1, 2))
+        self.assertNotIn("work", client.history_calls)
 
     def test_collect_paginatedRepositoryList_readsAllPages(self):
         repos = [repo(f"r{i}", f"h{i}") for i in range(5)]
